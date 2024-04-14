@@ -16,3 +16,6 @@ override.tf.json
 .terraformrc
 terraform.rc
 *.asc
+
+# python local venvs
+.venv/
