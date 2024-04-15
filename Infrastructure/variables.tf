@@ -32,3 +32,28 @@ variable "private_subnets_cidr" {
   type        = list(string)
   description = "The list of private subnets to deploy"
 }
+
+variable "db_username" {
+  type        = string
+  description = "Username to connect to rds"
+}
+variable "db_password" {
+  type        = string
+  description = "Password to connect to rds"
+}
+variable "lambda_path_code" {
+  type        = string
+  description = "Handler name to run lambda"
+}
+variable "lambda_path_layer" {
+  type        = string
+  description = "Layer path to lambda"
+}
+variable "runtime" {
+  type        = string
+  description = "Runtime to lambda"
+}
+variable "timeout" {
+  type        = string
+  description = "Timeout to lambda"
+}

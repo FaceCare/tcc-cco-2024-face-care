@@ -16,3 +16,7 @@ override.tf.json
 .terraformrc
 terraform.rc
 *.asc
+
+layer*
+venv
+*.zip

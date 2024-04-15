@@ -73,9 +73,9 @@ resource "aws_route" "public_internet_gateway" {
 }
 
 resource "aws_route" "private_nat_gateway" {
-  route_table_id         = "${aws_route_table.private.id}"
+  route_table_id         = aws_route_table.private.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = "${aws_nat_gateway.nat.id}"
+  nat_gateway_id         = aws_nat_gateway.nat.id
 }
 /* Route table associations */
 resource "aws_route_table_association" "public" {
@@ -93,7 +93,7 @@ resource "aws_route_table_association" "private" {
 resource "aws_security_group" "default" {
   name        = "${local.project_name}-default-sg"
   description = "Default security group to allow inbound/outbound from the VPC"
-  vpc_id      = "${aws_vpc.vpc.id}"
+  vpc_id      = aws_vpc.vpc.id
   depends_on  = [aws_vpc.vpc]
   ingress {
     from_port = "0"
@@ -101,7 +101,7 @@ resource "aws_security_group" "default" {
     protocol  = "-1"
     self      = true
   }
-  
+
   egress {
     from_port = "0"
     to_port   = "0"
