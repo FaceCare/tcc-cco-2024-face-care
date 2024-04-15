@@ -1,13 +1,12 @@
 from sqlalchemy import Column, ForeignKey, Integer, BIGINT, VARCHAR
 from sqlalchemy.orm import relationship
 
-from ..config.database import Base
+from ..config.database import Base_Tcc
 from ..model.login_model import Login
 from ..model.photo_model import Photo
 
-class User(Base):
+class User(Base_Tcc):
     __tablename__ = "user"
-    __table_args__ = {"schema": "tcc"} # TODO: add schema to env
 
     id = Column(BIGINT, primary_key=True)
     first_name = Column(VARCHAR)

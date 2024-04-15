@@ -1,10 +1,9 @@
 from sqlalchemy import Column, BIGINT, VARCHAR
 
-from ..config.database import Base
+from ..config.database import Base_Tcc
 
-class Login(Base):
+class Login(Base_Tcc):
     __tablename__ = "login"
-    __table_args__ = {"schema": "tcc"} # TODO: add schema to env
 
     id = Column(BIGINT, primary_key=True)
     login = Column(VARCHAR)
