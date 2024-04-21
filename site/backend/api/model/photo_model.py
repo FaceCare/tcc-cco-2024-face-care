@@ -1,6 +1,6 @@
 from sqlalchemy import Column, BIGINT, VARCHAR, TEXT
 
-from ..config.database import Base_Tcc
+from config.database import Base_Tcc
 
 class Photo(Base_Tcc):
     __tablename__ = "photo"
