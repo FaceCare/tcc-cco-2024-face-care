@@ -21,3 +21,12 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
     events              = ["s3:ObjectCreated:*"]
   }
 }
+
+
+resource "aws_s3_bucket" "s3_saved_model" {
+  bucket = "${local.project_name}-saved-model-bucket"
+
+  tags = {
+    Name = "${local.project_name}-saved-model-bucket"
+  }
+}

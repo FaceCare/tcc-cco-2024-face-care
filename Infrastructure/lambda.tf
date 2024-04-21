@@ -34,9 +34,9 @@ resource "aws_lambda_function" "image_processing" {
     variables = local.get_env
   }
   dynamic "vpc_config" {
-    for_each = length(var.private_subnets_cidr) > 0 ? [1] : []
+    for_each = length(var.public_subnets_cidr) > 0 ? [1] : []
     content {
-      subnet_ids         = [aws_subnet.private_subnet[0].id]
+      subnet_ids         = [aws_subnet.public_subnet[0].id]
       security_group_ids = [aws_security_group.lambda_security_group.id]
     }
   }

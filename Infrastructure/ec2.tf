@@ -28,7 +28,7 @@ data "aws_iam_instance_profile" "instance_profile" {
 
 resource "aws_instance" "jupiter_notebook" {
   ami           = data.aws_ami.amzlinux.id
-  instance_type = "t2.micro"
+  instance_type = "t3a.small"
   user_data       = file("jupiter.sh")
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.public_subnet[0].id
