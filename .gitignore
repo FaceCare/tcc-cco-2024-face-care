@@ -17,5 +17,6 @@ override.tf.json
 terraform.rc
 *.asc
 
-# python local venvs
+# python local files and folders
 .venv/
+__pycache__
