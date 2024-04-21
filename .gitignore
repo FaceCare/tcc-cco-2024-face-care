@@ -17,6 +17,10 @@ override.tf.json
 terraform.rc
 *.asc
 
+layer*
+venv
+*.zip
+
 # python local files and folders
 .venv/
 __pycache__
