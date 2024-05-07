@@ -1,6 +1,6 @@
 from sqlalchemy import Column, BIGINT, VARCHAR
 
-from ..config.database import Base_Tcc
+from config.database import Base_Tcc
 
 class Login(Base_Tcc):
     __tablename__ = "login"
