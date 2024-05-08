@@ -36,3 +36,6 @@ locals {
   # revision_task_definition = max(aws_ecs_task_definition.crm_core_infra.revision, data.aws_ecs_task_definition.main.revision)
 
 }
+locals {
+  project_name = "${var.app_name}-${var.env_name}"
+}
