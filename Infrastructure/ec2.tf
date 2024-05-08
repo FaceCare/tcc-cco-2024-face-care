@@ -27,15 +27,15 @@ data "aws_iam_instance_profile" "instance_profile" {
 }
 
 resource "aws_instance" "jupiter_notebook" {
-  ami           = data.aws_ami.amzlinux.id
-  instance_type = "t3a.small"
-  user_data       = file("jupiter.sh")
+  ami                         = data.aws_ami.amzlinux.id
+  instance_type               = "t3a.small"
+  # user_data                   = file("jupiter.sh")
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.public_subnet[0].id
   vpc_security_group_ids      = [aws_security_group.allow_jupiter.id]
   iam_instance_profile        = data.aws_iam_instance_profile.instance_profile.name
 
   tags = {
-    Name = "${local.project_name}-jupiter-notebook"
+    Name = "${local.project_name}-server"
   }
 }
