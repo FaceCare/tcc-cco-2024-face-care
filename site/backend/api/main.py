@@ -3,7 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from dotenv import load_dotenv
 
-from routes import (user_router)
+from routes import (user_router, login_router)
 
 load_dotenv()
 
@@ -22,6 +22,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(user_router, tags=["User"])
+app.include_router(user_router, tags=["User"], prefix='/user')
+app.include_router(login_router, tags=["Login"], prefix='/login')
 
 add_pagination(app)

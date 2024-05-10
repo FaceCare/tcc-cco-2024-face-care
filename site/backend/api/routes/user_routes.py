@@ -9,6 +9,14 @@ from config.get_db import get_db
 
 app_router = APIRouter()
 
+@app_router.post('/', status_code=201)
+def post(
+    db: Session = Depends(get_db),
+    user: UserCreateSchema=Body()
+    ):
+    
+    UserService.create_user(db, user)
+
 @app_router.get('/', status_code=200,
                 response_model=List[GetUsersSchema])
 def get(
@@ -17,11 +25,3 @@ def get(
     ) -> List[GetUsersSchema]:
     
     return UserService.get_users(db, limit)
-
-@app_router.post('/', status_code=201)
-def post(
-    db: Session = Depends(get_db),
-    user: UserCreateSchema=Body()
-    ):
-    
-    UserService.create_user(db, user)

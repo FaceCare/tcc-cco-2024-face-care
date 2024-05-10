@@ -26,4 +26,4 @@ venv
 
 # python local files and folders
 .venv/
-__pycache__
+__pycache__/

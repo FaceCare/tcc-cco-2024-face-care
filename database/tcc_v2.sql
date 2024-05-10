@@ -1,5 +1,6 @@
 -- TCC_V1
 
+-- drop database if exists tcc;
 create database if not exists tcc;
 
 use tcc;
@@ -8,7 +9,7 @@ create table if not exists `tcc`.`photo` (
 	id bigint primary key auto_increment,
 	url text,
 	date datetime,
-	classification varchar(60)
+	degree int(4)
 );
 
 create table if not exists `tcc`.`login` (
