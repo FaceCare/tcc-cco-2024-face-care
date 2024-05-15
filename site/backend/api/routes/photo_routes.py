@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from fastapi import Query, Body
 from typing import List
 
-from schema.user_schema import (GetUsersSchema, UserCreateSchema, UserUpdateSchema)
-from model.user_model import User
-from service.user_service import UserService
+from schema.photo_schema import (GetPhotosSchema, PhotoCreateSchema)
+from model.photo_model import Photo
+from service.photo_service import PhotoService
 from config.get_db import get_db
 
 app_router = APIRouter()
@@ -14,20 +14,19 @@ app_router = APIRouter()
 @app_router.post('/', status_code=201)
 def post(
     db: Session = Depends(get_db),
-    user: UserCreateSchema=Body()
+    photo_schema: PhotoCreateSchema=Body()
     ):
     
-    UserService.create(db, User, user)
-
+    PhotoService.create(db, Photo, photo_schema)
 
 @app_router.get('/', status_code=200,
-                response_model=List[GetUsersSchema])
+                response_model=List[GetPhotosSchema])
 def get(
     db: Session = Depends(get_db),
     limit: int=Query(default=100)
-    ) -> List[GetUsersSchema]:
+    ) -> List[GetPhotosSchema]:
     
-    if result := UserService.read(db, User, limit):
+    if result := PhotoService.read(db, Photo, limit):
         return result
 
     return Response(None, 204)
@@ -36,10 +35,10 @@ def get(
 # def put(
 #     db: Session = Depends(get_db),
 #     id: int = Query(),
-#     new_login: UserUpdateSchema = Body()
+#     new_login: LoginUpdateSchema = Body()
 #     ):
     
-#     UserService.update_by_id(db)
+#     PhotoService.update_by_id(db)
 
 @app_router.delete('/', status_code=200)
 def delete(
@@ -47,4 +46,4 @@ def delete(
     id: int = Query()
     ):
     
-    UserService.delete_by_id(db, User, id)
+    PhotoService.delete_by_id(db, Photo, id)

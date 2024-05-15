@@ -1,14 +1,13 @@
 from sqlalchemy.orm import Session
 
+from service.crud_service import CrudService
 from repository.user_repository import UserRepository
 from schema.user_schema import UserCreateSchema
 
-class UserService:
+class UserService(CrudService):
 
-    @staticmethod
-    def get_users(db: Session, limit: int=100):
-        return UserRepository.get_users(db, limit)
+    def __init__(self) -> None:
+        super().__init__()
 
-    @staticmethod
-    def create_user(db: Session, user: UserCreateSchema):
-        UserRepository.create_user(db, user)
+    def update_by_id(self):
+        raise NotImplementedError()

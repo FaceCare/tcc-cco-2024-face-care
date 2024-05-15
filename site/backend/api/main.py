@@ -3,13 +3,13 @@ from starlette.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from dotenv import load_dotenv
 
-from routes import (user_router)
+from routes import (user_router, login_router, photo_router)
 
 load_dotenv()
 
 app = FastAPI(
     title=f"Face Care",
-    version=f"0.0.0",
+    version=f"1.0.0",
     docs_url="/docs",
     root_path=f"",
 )
@@ -22,6 +22,8 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(user_router, tags=["User"])
+app.include_router(user_router, tags=["User"], prefix='/user')
+app.include_router(login_router, tags=["Login"], prefix='/login')
+app.include_router(photo_router, tags=["Photo"], prefix='/photo')
 
 add_pagination(app)
