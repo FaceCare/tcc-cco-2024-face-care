@@ -5,7 +5,6 @@ class GetLoginsSchema(BaseModel):
         from_attributes = True
         
     login: str
-    passwd: str # TODO: remove passwd when finish testing
 
 class LoginCreateSchema(BaseModel):
     login: str

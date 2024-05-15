@@ -9,7 +9,7 @@ load_dotenv()
 
 app = FastAPI(
     title=f"Face Care",
-    version=f"0.0.0",
+    version=f"1.0.0",
     docs_url="/docs",
     root_path=f"",
 )
@@ -24,6 +24,6 @@ app.add_middleware(
 
 app.include_router(user_router, tags=["User"], prefix='/user')
 app.include_router(login_router, tags=["Login"], prefix='/login')
-app.include_router(login_router, tags=["Photo"], prefix='/photo')
+app.include_router(photo_router, tags=["Photo"], prefix='/photo')
 
 add_pagination(app)

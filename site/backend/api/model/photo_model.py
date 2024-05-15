@@ -8,4 +8,4 @@ class Photo(Base_Tcc):
     id = Column(BIGINT, primary_key=True)
     url = Column(TEXT)
     date = Column(DATETIME)
-    classification = Column(VARCHAR)
+    degree = Column(VARCHAR)

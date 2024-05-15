@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field
 
 class GetUsersSchema(BaseModel):
     class Config:
@@ -24,7 +24,7 @@ class UserCreateSchema(BaseModel):
     cpf: str
     phone_number: str
     fk_login: int
-    fk_photo: int
+    fk_photo: int | None = Field(default=None)
 
 class UserUpdateSchema(BaseModel):
     first_name: str

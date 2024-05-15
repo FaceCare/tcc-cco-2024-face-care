@@ -5,7 +5,7 @@ from fastapi import Query, Body
 from typing import List
 
 from schema.photo_schema import (GetPhotosSchema, PhotoCreateSchema)
-from model.login_model import Login
+from model.photo_model import Photo
 from service.photo_service import PhotoService
 from config.get_db import get_db
 
@@ -14,10 +14,10 @@ app_router = APIRouter()
 @app_router.post('/', status_code=201)
 def post(
     db: Session = Depends(get_db),
-    login_schema: PhotoCreateSchema=Body()
+    photo_schema: PhotoCreateSchema=Body()
     ):
     
-    PhotoService.create(db, Login, login_schema)
+    PhotoService.create(db, Photo, photo_schema)
 
 @app_router.get('/', status_code=200,
                 response_model=List[GetPhotosSchema])
@@ -26,7 +26,7 @@ def get(
     limit: int=Query(default=100)
     ) -> List[GetPhotosSchema]:
     
-    if result := PhotoService.read(db, Login, limit):
+    if result := PhotoService.read(db, Photo, limit):
         return result
 
     return Response(None, 204)
@@ -46,4 +46,4 @@ def delete(
     id: int = Query()
     ):
     
-    PhotoService.delete_by_id(db, Login, id)
+    PhotoService.delete_by_id(db, Photo, id)
