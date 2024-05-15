@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import Column
 from pydantic import BaseModel
+from abc import abstractmethod, ABC
 
 from repository.crud_repository import CrudRepository
 
-class CrudService:
+class CrudService(ABC):
     
     def __init__(self) -> None:
         super().__init__()
@@ -17,11 +18,11 @@ class CrudService:
     def read(db: Session, model: BaseModel, limit: int):
         return CrudRepository.read(db, model, limit)
 
-    @staticmethod
-    def update_by_id(db: Session, model: BaseModel, id: int, **new_data):
-        # FIXXXXXXXXXXXXXX
-        CrudRepository.update(db, model, id, new_data)
+    @abstractmethod
+    def update_by_id(self):
+        '''Implement if needed'''
+        ...
 
     @staticmethod
-    def delete(db: Session, column: Column, value_delete):
-        CrudRepository.delete(db, column, value_delete)
+    def delete_by_id(db: Session, model: BaseModel, id: int):
+        CrudRepository.delete_by_id(db, model, id)

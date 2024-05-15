@@ -25,3 +25,10 @@ class UserCreateSchema(BaseModel):
     phone_number: str
     fk_login: int
     fk_photo: int
+
+class UserUpdateSchema(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    cpf: str
+    phone_number: str

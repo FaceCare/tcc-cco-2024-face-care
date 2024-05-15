@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from abc import abstractmethod, ABC
 
-class CrudRepository:
+class CrudRepository(ABC):
 
     @staticmethod
     def create(db: Session, model: BaseModel, **new_data):
@@ -15,10 +16,11 @@ class CrudRepository:
         return db.query(model).limit(limit).all()
 
     @staticmethod
-    def update_by_id(db: Session, model: BaseModel, id: int, **new_data):
-        db.query(model).filter_by(model.id == id).update(new_data)
-        db.commit()
+    @abstractmethod
+    def update_by_id(db: Session):
+        ...
 
     @staticmethod
-    def delete(db: Session, column, value_delete):
-        ...
+    def delete_by_id(db: Session, model: BaseModel, id: int):
+        db.query(model).filter(model.id == id).delete()
+        db.commit()

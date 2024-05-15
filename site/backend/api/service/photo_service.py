@@ -1,7 +1,6 @@
-from sqlalchemy.orm import Session
 from .crud_service import CrudService
 
-class LoginService(CrudService):
+class PhotoService(CrudService):
 
     def __init__(self) -> None:
         super().__init__()

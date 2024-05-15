@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from fastapi import Query, Body
 from typing import List
@@ -29,14 +29,21 @@ def get(
     if result := LoginService.read(db, Login, limit):
         return result
 
-    return JSONResponse(status_code=204)
+    return Response(None, 204)
 
-@app_router.put('/', status_code=200,
-                response_model=List[GetLoginsSchema])
-def get(
+# @app_router.put('/', status_code=200)
+# def put(
+#     db: Session = Depends(get_db),
+#     id: int = Query(),
+#     new_login: LoginUpdateSchema = Body()
+#     ):
+    
+#     LoginService.update_by_id(db)
+
+@app_router.delete('/', status_code=200)
+def delete(
     db: Session = Depends(get_db),
-    id: int = Query(),
-    new_login: LoginUpdateSchema = Body()
+    id: int = Query()
     ):
     
-    LoginService.update_by_id(db, Login, id, new_login)
+    LoginService.delete_by_id(db, Login, id)

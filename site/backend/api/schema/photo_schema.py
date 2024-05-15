@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-class GetLoginsSchema(BaseModel):
+class GetPhotosSchema(BaseModel):
     class Config:
         from_attributes = True
         
@@ -9,7 +9,7 @@ class GetLoginsSchema(BaseModel):
     date: datetime
     degree: int
 
-class LoginCreateSchema(BaseModel):
+class PhotoCreateSchema(BaseModel):
     url: str
     date: datetime
     degree: int
