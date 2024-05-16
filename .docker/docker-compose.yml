@@ -1,0 +1,36 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0.36
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - "${PWD}/../database/tcc_v2.sql:/docker-entrypoint-initdb.d/1.sql"
+    environment:
+      MYSQL_ROOT_PASSWORD : ${MYSQL_ROOT_PASSWORD}
+    networks:
+      tcc_network:
+        ipv4_address: 10.5.0.2
+
+  backend:
+    build:
+      context: "${PWD}/../site/backend/api/"
+      dockerfile: "Dockerfile"
+    environment:
+      DATABASE_URL: mysql+pymysql://${USER_DB}:${MYSQL_ROOT_PASSWORD}@mysql:3306/tcc
+    ports:
+     - "8000:8000"
+    networks:
+      tcc_network:
+        ipv4_address: 10.5.0.3
+    depends_on:
+      - mysql
+
+networks:
+  tcc_network:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
