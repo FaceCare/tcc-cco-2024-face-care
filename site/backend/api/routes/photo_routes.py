@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
-from fastapi import Query, Body
+from fastapi import Query, Body, UploadFile
 from typing import List
 
 from schema.photo_schema import (GetPhotosSchema, PhotoCreateSchema)
@@ -47,3 +47,11 @@ def delete(
     ):
     
     PhotoService.delete_by_id(db, Photo, id)
+
+@app_router.post('/upload', status_code=200)
+def upload(
+    photo: UploadFile = Depends(PhotoService.validate_photo),
+    db: Session = Depends(get_db)
+):
+    
+    PhotoService.upload()
