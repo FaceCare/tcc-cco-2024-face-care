@@ -2,8 +2,11 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from dotenv import load_dotenv
+import logging
 
 from routes import (user_router, login_router, photo_router)
+
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
