@@ -1,0 +1,10 @@
+# demo.aws_ec2.yml
+plugin: amazon.aws.aws_ec2
+
+# Attach the default AWS profile
+# aws_profile: faculdade
+hostnames:
+  - instance-id
+
+regions:
+  - us-east-1
