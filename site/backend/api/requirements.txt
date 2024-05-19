@@ -1,0 +1,11 @@
+fastapi==0.111.0
+SQLAlchemy==2.0.29
+uvicorn==0.29.0
+pymysql==1.1.0
+python-dotenv==1.0.1
+fastapi-pagination==0.12.24
+boto3==1.34.107
+python-multipart==0.0.9
+
+# https://fastapi.tiangolo.com/tutorial/sql-databases/
+# https://github.com/tiangolo/full-stack-fastapi-template/blob/master/backend/app/api/routes/login.py
