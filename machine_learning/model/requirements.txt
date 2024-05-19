@@ -1,0 +1,8 @@
+numpy==1.26.4
+scikit-learn==1.4.2
+scikit-image==0.23.2
+matplotlib==3.9.0
+opencv-python==4.9.0.80
+tensorflow==2.16.1
+## cmake==3.29.3
+## dlib==19.21.1
