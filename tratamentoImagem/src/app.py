@@ -4,7 +4,7 @@ import os
 import numpy as np
 from botocore.exceptions import NoCredentialsError
 
-boto3.setup_default_session(profile_name="faculdade")
+# boto3.setup_default_session(profile_name="faculdade")
 
 # Função para baixar uma imagem do S3
 def download_image(bucket_name, image_key, local_filename):
@@ -33,12 +33,12 @@ def get_folder_path():
     return input("Por favor, insira o caminho da pasta: ")
 
 # Solicite o caminho da pasta ao usuário
-folder_path = "/Acne"
+folder_path = "Acne"
 
 # Verifique se o caminho da pasta é válido
-if not os.path.isdir(folder_path):
-    print(f"O caminho {folder_path} não é uma pasta válida.")
-    exit(1)
+# if not os.path.isdir(folder_path):
+#     print(f"O caminho {folder_path} não é uma pasta válida.")
+#     exit(1)
 
 # Defina os nomes dos buckets da AWS
 bucket_raw = 'tcc-dev-raw-bucket'
@@ -59,7 +59,7 @@ staged_images = [obj.key for obj in staged_bucket.objects.all()]
 # Verifique se há novas imagens no bucket raw
 for image_key in raw_images:
     if image_key not in staged_images:
-        local_filename = os.path.join(folder_path, 'temp_image.jpg')
+        local_filename = os.path.join('temp_image.jpg')
         # Baixe a imagem do bucket raw
         download_image(bucket_raw, image_key, local_filename)
         # Carregue a imagem em tons de cinza
