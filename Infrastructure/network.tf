@@ -90,3 +90,11 @@ resource "aws_security_group" "default" {
     self      = "true"
   }
 }
+
+
+
+#eip instance
+resource "aws_eip" "lb" {
+  instance = aws_instance.jupiter_notebook.id
+  domain   = "vpc"
+}

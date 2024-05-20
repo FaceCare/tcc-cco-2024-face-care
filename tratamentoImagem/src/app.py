@@ -65,7 +65,7 @@ for image_key in raw_images:
         # Carregue a imagem em tons de cinza
         grayscale_image = load_image_grayscale(local_filename)
         # Salve a imagem processada no bucket staged
-        processed_image_key = 'processed/' + image_key  # Adicione um prefixo para identificar imagens processadas
+        processed_image_key = 'Acne/' + image_key  # Adicione um prefixo para identificar imagens processadas
         cv2.imwrite(local_filename, grayscale_image)  # Sobrescreve a imagem original com a versão em tons de cinza
         upload_image(bucket_staged, image_key, local_filename)
         print(f"Imagem {image_key} processada e salva no bucket staged")
