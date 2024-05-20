@@ -6,6 +6,14 @@ resource "aws_s3_bucket" "s3_raw" {
   }
 }
 
+resource "aws_s3_bucket" "s3_staged" {
+  bucket = "${local.project_name}-staged-bucket"
+
+  tags = {
+    Name = "${local.project_name}-staged-bucket"
+  }
+}
+
 resource "aws_s3_bucket" "s3_consumed" {
   bucket = "${local.project_name}-consumed-bucket"
 
