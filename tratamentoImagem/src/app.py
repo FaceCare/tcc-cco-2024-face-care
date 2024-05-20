@@ -33,7 +33,7 @@ def get_folder_path():
     return input("Por favor, insira o caminho da pasta: ")
 
 # Solicite o caminho da pasta ao usuário
-folder_path = get_folder_path()
+folder_path = "/Acne"
 
 # Verifique se o caminho da pasta é válido
 if not os.path.isdir(folder_path):
