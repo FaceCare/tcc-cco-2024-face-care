@@ -1,9 +1,9 @@
-data "aws_ami" "amzlinux" {
+data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["amazon"]
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*-gp2"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-*"]
   }
 
   filter {
@@ -27,9 +27,9 @@ data "aws_iam_instance_profile" "instance_profile" {
 }
 
 resource "aws_instance" "jupiter_notebook" {
-  ami                         = "ami-04b70fa74e45c3917"
-  # ami                         = data.aws_ami.amzlinux.id
-  instance_type               = "t3a.small"
+  # ami                         = "ami-04b70fa74e45c3917"
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3a.small"
   # user_data                   = file("jupiter.sh")
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.public_subnet[0].id

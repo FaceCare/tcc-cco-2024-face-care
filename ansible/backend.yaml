@@ -1,0 +1,23 @@
+---
+- name: Wait for connection to be available and install Docker
+  hosts: all
+  vars:
+    ansible_connection: aws_ssm
+    ansible_aws_ssm_bucket_name: ansible-tcc
+    ansible_aws_ssm_region: us-east-1
+  tasks:
+    - name: Wait for connection
+      wait_for_connection:
+
+    - name: Switch to directory and perform Git operations
+      become: true
+      become_user: root
+      shell: |
+        cd ~/tcc/tcc-cco-2024-face-care/
+        git checkout dev
+        git pull
+        cd .docker/
+        docker-compose stop
+        docker image rm docker_backend --force
+        docker-compose up --build -d
+      ignore_errors: yes

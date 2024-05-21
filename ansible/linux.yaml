@@ -1,5 +1,4 @@
 ---
-# Wait for SSM Agent to be available on the Instance
 - name: Wait for connection to be available and install Docker
   hosts: all
   vars:
@@ -10,34 +9,40 @@
     - name: Wait for connection
       wait_for_connection:
 
-    # - name: Change to user home directory
-    #   ansible.builtin.command: cd ~
+    - name: Grant sudo permissions to ssm-user
+      become: yes
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/ssm-agent-users
+        content: "ssm-user ALL=(ALL) NOPASSWD:ALL"
+        mode: "0440"
 
-    # - name: Check if tcc directory exists
-    #   ansible.builtin.stat:
-    #     path: ~/tcc
-    #   register: tcc_dir
-
-    # - name: Create tcc directory if it does not exist
-    #   ansible.builtin.file:
-    #     path: ~/tcc
-    #     state: directory
-    #   when: not tcc_dir.stat.exists
-
-    # - name: Change to tcc directory
-    #   ansible.builtin.shell: cd ~/tcc
-
-    - name: Update apt package index
+    - name: Update apt package index and upgrade packages
       apt:
         update_cache: yes
-      become: yes
-
-    - name: Upgrade all installed packages
-      apt:
         upgrade: dist
       become: yes
 
-    - name: Install required packages for Docker
+    - name: Install Python 3.10 and pip
+      apt:
+        name:
+          - python3.10
+          - python3-pip
+        state: present
+      become: yes
+
+    - name: Set Python 3.10 as default
+      ansible.builtin.shell: update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+      become: yes
+
+    - name: Install setuptools and wheel using pip
+      pip:
+        name:
+          - setuptools
+          - wheel
+        executable: pip3.10
+      become: yes
+
+    - name: Install Docker prerequisites
       apt:
         name:
           - apt-transport-https
@@ -45,23 +50,12 @@
           - curl
           - gnupg
           - lsb-release
-        state: present
       become: yes
 
-    - name: Add Docker's official GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-      become: yes
-
-    - name: Set up the stable Docker repository
-      ansible.builtin.shell: |
-        echo "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-      become: yes
-
-    - name: Update apt package index again
-      apt:
-        update_cache: yes
+    - name: Add Docker GPG key and repository
+      ansible.builtin.shell: >
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        && sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
       become: yes
 
     - name: Install Docker
@@ -70,6 +64,15 @@
         state: present
       become: yes
 
+    - name: Create Docker group and add current user to Docker group
+      ansible.builtin.group:
+        name: docker
+        state: present
+      become: yes
+      vars:
+        groups: docker
+        append: yes
+
     - name: Start and enable Docker service
       systemd:
         name: docker
@@ -77,37 +80,9 @@
         enabled: yes
       become: yes
 
-    - name: Download Docker Compose
-      ansible.builtin.shell: |
-        curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-      args:
-        creates: /usr/local/bin/docker-compose
-      become: yes
-
-    - name: Apply executable permissions to Docker Compose binary
+    - name: Ensure ~/.ssh directory exists
       ansible.builtin.file:
-        path: /usr/local/bin/docker-compose
-        mode: "0755"
+        path: /home/ssm-user/.ssh
+        state: directory
+        mode: '0700'
       become: yes
-
-    - name: Verify Docker installation
-      command: docker --version
-      register: docker_version
-
-    - name: Verify Docker Compose installation
-      command: docker-compose --version
-      register: docker_compose_version
-
-    - debug:
-        msg:
-          - "Docker version: {{ docker_version.stdout }}"
-          - "Docker Compose version: {{ docker_compose_version.stdout }}"
-
-
-
-
-
-
-
-
- install python3-pip
