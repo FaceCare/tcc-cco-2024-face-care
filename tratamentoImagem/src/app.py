@@ -1,4 +1,3 @@
-############################################# teste
 import boto3
 import cv2
 import os
