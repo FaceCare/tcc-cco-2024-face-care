@@ -12,7 +12,7 @@ import shutil
 import joblib
 from datetime import datetime
 
-boto3.setup_default_session(profile_name="faculdade") # TODO: remove in production
+# boto3.setup_default_session(profile_name="faculdade") # TODO: remove in production
 s3 = boto3.client('s3')
 bucket_staged = 'tcc-dev-staged-bucket'
 bucket_model = 'tcc-dev-saved-model-bucket'
