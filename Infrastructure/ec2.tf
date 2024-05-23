@@ -36,6 +36,10 @@ resource "aws_instance" "jupiter_notebook" {
   vpc_security_group_ids      = [aws_security_group.allow_jupiter.id]
   iam_instance_profile        = data.aws_iam_instance_profile.instance_profile.name
 
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
   tags = {
     Name = "${local.project_name}-server"
   }

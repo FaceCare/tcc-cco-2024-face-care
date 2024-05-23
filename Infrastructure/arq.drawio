@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-05-20T22:06:46.296Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" etag="fO5MVU8vPGuA7wHIia0e" version="24.4.4" type="device" pages="2">
+<mxfile host="app.diagrams.net" modified="2024-05-22T00:45:59.452Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" etag="BZuuViA4b4Qt8Xarp8nB" version="24.4.4" type="device" pages="2">
   <diagram name="OLD" id="ZqrJ_23zCe6DwrdORcf6">
-    <mxGraphModel dx="2022" dy="655" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1877" dy="562" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -321,6 +321,18 @@
         </mxCell>
         <mxCell id="luwaq-FpW5Ecqqxh3gmB-34" value="&lt;span style=&quot;text-wrap: wrap;&quot;&gt;Classifica Img (Backend)&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1998" y="677.5" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="8PdyWn6hzcgGw1TuxxXG-1" value="" style="sketch=0;html=1;aspect=fixed;strokeColor=none;shadow=0;align=center;fillColor=#2D9C5E;verticalAlign=top;labelPosition=center;verticalLabelPosition=bottom;shape=mxgraph.gcp2.check" vertex="1" parent="1">
+          <mxGeometry x="2011" y="463" width="25" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="8PdyWn6hzcgGw1TuxxXG-2" value="" style="sketch=0;html=1;aspect=fixed;strokeColor=none;shadow=0;align=center;fillColor=#2D9C5E;verticalAlign=top;labelPosition=center;verticalLabelPosition=bottom;shape=mxgraph.gcp2.check" vertex="1" parent="1">
+          <mxGeometry x="2170" y="463" width="25" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="8PdyWn6hzcgGw1TuxxXG-3" value="" style="sketch=0;html=1;aspect=fixed;strokeColor=none;shadow=0;align=center;fillColor=#2D9C5E;verticalAlign=top;labelPosition=center;verticalLabelPosition=bottom;shape=mxgraph.gcp2.check" vertex="1" parent="1">
+          <mxGeometry x="2011" y="553" width="25" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="8PdyWn6hzcgGw1TuxxXG-4" value="" style="sketch=0;html=1;aspect=fixed;strokeColor=none;shadow=0;align=center;fillColor=#2D9C5E;verticalAlign=top;labelPosition=center;verticalLabelPosition=bottom;shape=mxgraph.gcp2.check" vertex="1" parent="1">
+          <mxGeometry x="2171" y="553" width="25" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
