@@ -54,4 +54,4 @@ def upload(
     db: Session = Depends(get_db)
 ):
     
-    PhotoService.upload()
+    PhotoService.upload(photo, db)
