@@ -36,15 +36,12 @@ try:
         if not os.path.exists(save_dir):
             pathlib.Path(save_dir).mkdir(parents=True, exist_ok=True)
             
-        count=0
         for f in files:
             print(f'Downloading file={f}')
             s3.download_file(bucket_name, f, os.path.join(save_dir, os.path.split(f)[-1]))
-            count+=1
-            if count==15: break
 
-    # download_list_files_s3(files_acne, bucket_staged, folders_imgs[0])
-    # download_list_files_s3(files_no_acne, bucket_staged, folders_imgs[1])
+    download_list_files_s3(files_acne, bucket_staged, folders_imgs[0])
+    download_list_files_s3(files_no_acne, bucket_staged, folders_imgs[1])
 
     def load_data(data_dir, img_size=(128, 128)):
         labels = []
