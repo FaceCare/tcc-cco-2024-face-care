@@ -4,7 +4,7 @@ import os
 import numpy as np
 from botocore.exceptions import NoCredentialsError
 
-# boto3.setup_default_session(profile_name="faculdade")
+boto3.setup_default_session(profile_name="faculdade")
 
 # Função para baixar uma imagem do S3
 def download_image(bucket_name, image_key, local_filename):
