@@ -4,7 +4,7 @@ from fastapi_pagination import add_pagination
 from dotenv import load_dotenv
 import logging
 
-from routes import (user_router, login_router, photo_router)
+from routes import (user_router, login_router, photo_router, acne_router)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -28,5 +28,6 @@ app.add_middleware(
 app.include_router(user_router, tags=["User"], prefix='/user')
 app.include_router(login_router, tags=["Login"], prefix='/login')
 app.include_router(photo_router, tags=["Photo"], prefix='/photo')
+app.include_router(acne_router, tags=["Acne"], prefix='/acne')
 
 add_pagination(app)

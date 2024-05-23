@@ -1,6 +1,7 @@
 import logging
 from fastapi import UploadFile
 from fastapi.exceptions import HTTPException
+from sqlalchemy.orm import Session
 
 from .crud_service import CrudService
 
@@ -20,5 +21,6 @@ class PhotoService(CrudService):
         return photo
 
     @staticmethod
-    def upload():
+    def upload(photo: UploadFile , db: Session):
         logging.info('Uploading photo...')
+        

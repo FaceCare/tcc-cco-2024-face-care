@@ -6,6 +6,10 @@ python-dotenv==1.0.1
 fastapi-pagination==0.12.24
 boto3==1.34.107
 python-multipart==0.0.9
+numpy==1.26.4
+joblib==1.4.2
+scikit-image==0.23.2
+scikit-learn==1.4.2
 
 # https://fastapi.tiangolo.com/tutorial/sql-databases/
 # https://github.com/tiangolo/full-stack-fastapi-template/blob/master/backend/app/api/routes/login.py
