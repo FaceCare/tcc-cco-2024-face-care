@@ -6,7 +6,7 @@ on:
       - feat/backend*
 
 jobs:
-  deploy:
+  deployBackend:
     runs-on: ubuntu-latest
 
     steps:
