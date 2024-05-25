@@ -57,7 +57,12 @@ class AcneService:
 
             shutil.rmtree(tmp_dir)
 
-            return {'status': has_acne, 'report': 'Você possí acne, recomendamos buscar um dermatologista!'}
+            if has_acne:
+                report_msg = 'Você possí acne, recomendamos buscar um dermatologista!'
+            else:
+                report_msg = 'Você não possuí acne, tudo normal por aqui!'
+
+            return {'status': has_acne, 'report': report_msg}
         
         except Exception as e:
             if os.path.exists(tmp_dir):
