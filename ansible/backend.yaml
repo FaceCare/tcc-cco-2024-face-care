@@ -19,5 +19,5 @@
         cd .docker/
         docker-compose stop
         docker image rm docker_backend --force
-        docker-compose up --build -d
+        docker-compose up --build -d -V
       ignore_errors: yes
