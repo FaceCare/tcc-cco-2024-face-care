@@ -9,21 +9,48 @@
     - name: Wait for connection
       wait_for_connection:
 
-    - name: Deploy modelo
+    - name: Ensure git is installed
       become: true
-      become_user: root
-      shell: |
-        cd ~/tcc/tcc-cco-2024-face-care/
-        git checkout dev
-        git pull
-        cd machine_learning/model/
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r requirements.txt
-      ignore_errors: yes
+      package:
+        name: git
+        state: present
 
-    - name: Add cronjob to run model_train_v1.py every 5 minutes
+    - name: Ensure Python 3 and pip are installed
+      become: true
+      package:
+        name:
+          - python3
+          - python3-pip
+        state: present
+
+    - name: Ensure required packages are installed
+      become: true
+      package:
+        name:
+          - ffmpeg
+          - libsm6
+          - libxext6
+        state: present
+
+    - name: Clone or update the repository
+      become: true
+      git:
+        repo: "git@github.com:FaceCare/tcc-cco-2024-face-care.git"
+        dest: "~/tcc/tcc-cco-2024-face-care"
+        version: dev
+        force: yes
+
+    - name: Install Python requirements
+      become: true
+      pip:
+        requirements: "~/tcc/tcc-cco-2024-face-care/machine_learning/model/requirements.txt"
+        state: present
+        executable: pip3
+
+    - name: Add cronjob to run model_train_v1.py every 30 minutes
+      become: true
       cron:
-        name: "Run app.py every 1 hour"
-        minute: "0"
+        name: "Run model_train_v1.py every 30 minutes"
+        minute: "*/30"
         job: "cd ~/tcc/tcc-cco-2024-face-care/machine_learning/model/ && python3 model_train_v1.py"
         state: present
