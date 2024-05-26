@@ -4,17 +4,9 @@ resource "aws_security_group" "allow_jupiter" {
   vpc_id      = aws_vpc.vpc.id
 
   ingress {
-    description = "Allow inbound traffic jupyter"
-    from_port   = 8888
-    to_port     = 8888
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Allow inbound traffic api"
-    from_port   = 8000
-    to_port     = 8000
+    description = "Allow inbound traffic to nginx"
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
