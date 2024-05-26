@@ -1,5 +1,5 @@
 ---
-- name: Wait for connection to be available and install Docker
+- name: Wait for connection to be available and manage Docker containers
   hosts: all
   vars:
     ansible_connection: aws_ssm
@@ -9,15 +9,35 @@
     - name: Wait for connection
       wait_for_connection:
 
-    - name: Switch to directory and perform Git operations
+    - name: Ensure git is installed
       become: true
-      become_user: root
-      shell: |
-        cd ~/tcc/tcc-cco-2024-face-care/
-        git checkout dev
-        git pull
-        cd .docker/
-        docker-compose stop
-        docker image rm docker_backend --force
-        docker-compose up --build -d -V
-      ignore_errors: yes
+      package:
+        name: git
+        state: present
+
+    - name: Clone or update the repository
+      become: true
+      git:
+        repo: "git@github.com:FaceCare/tcc-cco-2024-face-care.git"
+        dest: "~/tcc/tcc-cco-2024-face-care"
+        version: dev
+        force: yes
+
+    - name: Stop Docker Compose services
+      become: true
+      shell: docker-compose stop
+      args:
+        chdir: ~/tcc/tcc-cco-2024-face-care/.docker/
+
+    - name: Remove Docker image
+      become: true
+      community.docker.docker_image:
+        name: docker_backend
+        state: absent
+        force_absent: true
+
+    - name: Build and start Docker Compose services
+      become: true
+      shell: docker-compose up --build -d -V
+      args:
+        chdir: ~/tcc/tcc-cco-2024-face-care/.docker/
