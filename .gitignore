@@ -27,3 +27,5 @@ venv
 # python local files and folders
 .venv/
 __pycache__/
+
+svm/
