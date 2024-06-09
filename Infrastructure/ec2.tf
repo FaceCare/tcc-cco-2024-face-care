@@ -27,8 +27,8 @@ data "aws_iam_instance_profile" "instance_profile" {
 }
 
 resource "aws_instance" "jupiter_notebook" {
-  # ami                         = "ami-04b70fa74e45c3917"
-  ami           = data.aws_ami.ubuntu.id
+  ami                         = "ami-012485deee5681dc0"
+  # ami           = data.aws_ami.ubuntu.id
   instance_type = "t3a.small"
   # user_data                   = file("jupiter.sh")
   associate_public_ip_address = true

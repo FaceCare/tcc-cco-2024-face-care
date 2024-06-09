@@ -84,5 +84,64 @@
       ansible.builtin.file:
         path: /home/ssm-user/.ssh
         state: directory
-        mode: '0700'
+        mode: "0700"
       become: yes
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+      become: yes
+
+    - name: Create Nginx reverse proxy configuration file
+      become: yes
+      ansible.builtin.copy:
+        dest: /etc/nginx/sites-available/reverse-proxy.conf
+        content: |
+          server {
+              listen 80;
+              server_name   facecare.ddns.net;
+
+              access_log /var/log/nginx/reverse-access.log;
+              error_log /var/log/nginx/reverse-error.log;
+
+              location / {
+                  proxy_pass http://127.0.0.1:8000;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+
+                  # WebSocket support
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+              }
+              location /jupyter/ {
+                  proxy_pass http://127.0.0.1:8888;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+
+                  # WebSocket support
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+              }
+          }
+
+    - name: Enable Nginx reverse proxy configuration
+      become: yes
+      ansible.builtin.shell: ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/reverse-proxy.conf || true
+
+    - name: Test Nginx configuration
+      become: yes
+      command: nginx -t
+
+    - name: Restart Nginx
+      become: yes
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
