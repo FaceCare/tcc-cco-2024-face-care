@@ -2,7 +2,6 @@ import boto3
 import cv2
 import os
 import numpy as np
-from PIL import Image
 from botocore.exceptions import NoCredentialsError
 from sklearn.decomposition import PCA
 
@@ -18,29 +17,33 @@ def download_image(bucket_name, image_key, local_filename):
 
 # Função para carregar uma imagem em tons de cinza
 def load_image_grayscale(filename):
-    try:
-        image = Image.open(filename).convert('L')
-        img_array = np.array(image)
-        return img_array
-    except Exception as e:
-        print(f"Erro ao carregar a imagem {filename}: {e}")
+    image = cv2.imread(filename)
+    if image is None:
+        print(f"Erro ao carregar a imagem {filename}")
         return None
+    grayscale_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return grayscale_image
 
 # Função para aplicar PCA
-def apply_pca(image, n_components=30):
-    original_img = Image.open(image).convert('L')
-    img_array = np.array(original_img)
+def apply_pca(image, variance_ratio=0.9):
+    # Flatten the image
+    flat_image = image.flatten().astype(np.float32)
+    # Apply PCA
+    pca = PCA(n_components=variance_ratio, svd_solver='full')
+    transformed = pca.fit_transform(flat_image.reshape(1, -1))
+    # Reconstruct the image from the principal components
+    reconstructed = pca.inverse_transform(transformed)
+    # Reshape back to the original image shape
+    pca_image = reconstructed.reshape(image.shape)
+    return pca_image
 
-    original_components = img_array.shape[1]
-
-    n_components = n_components
-
-    pca = PCA(n_components=n_components)
-    pca.fit(img_array)
-    img_transformed = pca.transform(img_array)
-    img_reconstructed = pca.inverse_transform(img_transformed)
-    processed_components = pca.n_components_
-    return img_reconstructed
+# Função para redimensionar a imagem
+def resize_image(image, scale_percent=50):
+    width = int(image.shape[1] * scale_percent / 100)
+    height = int(image.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    resized = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+    return resized
 
 # Função para fazer upload de uma imagem para o S3
 def upload_image(bucket_name, image_key, local_filename):
@@ -52,8 +55,8 @@ def upload_image(bucket_name, image_key, local_filename):
 
 # Defina os nomes dos buckets da AWS
 bucket_raw = 'tcc-dev-raw-bucket'
-bucket_staged = 'tcc-dev-staged-bucket'
-
+bucket_staged = 'tcc-dev-consumed-bucket'
+boto3.setup_default_session(profile_name="faculdade")
 # Conecte-se ao serviço S3
 s3 = boto3.resource('s3')
 
@@ -68,23 +71,19 @@ staged_images = [obj.key for obj in staged_bucket.objects.all()]
 # Verifique se há novas imagens no bucket raw
 for image_key in raw_images:
     if image_key not in staged_images:
-        local_filename = 'temp_image.jpg'
+        local_filename = os.path.join('temp_image.jpg')
         # Baixe a imagem do bucket raw
         if download_image(bucket_raw, image_key, local_filename):
-            # Verifique se a imagem foi baixada corretamente
-            if os.path.getsize(local_filename) > 0:
-                # Carregue a imagem em tons de cinza
-                grayscale_image = load_image_grayscale(local_filename)
-                if grayscale_image is not None:
-                    # Aplique PCA
-                    pca_image = apply_pca(grayscale_image)
-                    # Converta para uint8
-                    pca_image_uint8 = pca_image.astype(np.uint8)
-                    # Salve a imagem processada no bucket staged
-                    processed_image_key = image_key  # Preserve a estrutura do caminho
-                    Image.fromarray(pca_image_uint8).save(local_filename)  # Salva a imagem PCA
-                    upload_image(bucket_staged, processed_image_key, local_filename)
-                    print(f"Imagem {image_key} processada e salva no bucket staged")
-                os.remove(local_filename)
-            else:
-                print(f"Falha ao baixar a imagem {image_key}")
+            # Carregue a imagem em tons de cinza
+            grayscale_image = load_image_grayscale(local_filename)
+            if grayscale_image is not None:
+                # Redimensione a imagem
+                resized_image = resize_image(grayscale_image)
+                # Aplique PCA
+                pca_image = apply_pca(resized_image)
+                # Salve a imagem processada no bucket staged
+                processed_image_key = image_key  # Preserve a estrutura do caminho
+                cv2.imwrite(local_filename, pca_image.astype(np.uint8))  # Salva a imagem PCA
+                upload_image(bucket_staged, processed_image_key, local_filename)
+                print(f"Imagem {image_key} processada e salva no bucket staged")
+            os.remove(local_filename)
