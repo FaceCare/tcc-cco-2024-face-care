@@ -14,7 +14,7 @@ import pathlib
 from skimage.color import rgb2gray
 
 try:
-    boto3.setup_default_session(profile_name="faculdade") #TODO: remove in production
+    # boto3.setup_default_session(profile_name="faculdade") #TODO: remove in production
     s3 = boto3.client('s3')
     bucket_consumed = 'tcc-dev-consumed-bucket'
     bucket_model = 'tcc-dev-saved-model-bucket'
@@ -70,7 +70,7 @@ try:
     X, y = load_data(data_dir)
 
     # Dividir os dados em conjuntos de treino e teste
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, train_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, train_size=0.8)
 
     # Treinar um classificador SVM não linear (RBF kernel)
     clf = SVC(kernel='rbf')
