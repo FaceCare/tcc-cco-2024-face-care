@@ -56,7 +56,7 @@ def upload_image(bucket_name, image_key, local_filename):
 # Defina os nomes dos buckets da AWS
 bucket_raw = 'tcc-dev-raw-bucket'
 bucket_staged = 'tcc-dev-consumed-bucket'
-boto3.setup_default_session(profile_name="faculdade")
+# boto3.setup_default_session(profile_name="faculdade")
 # Conecte-se ao serviço S3
 s3 = boto3.resource('s3')
 
