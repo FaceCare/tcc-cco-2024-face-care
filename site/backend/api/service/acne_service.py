@@ -10,6 +10,7 @@ from skimage.feature import hog
 from skimage.color import rgb2gray
 from fastapi import UploadFile
 from fastapi.exceptions import HTTPException
+from datetime import datetime
 
 from integrations.storage_s3 import StorageS3
 from enums.bucket_s3_enum import BucketS3Enum
@@ -19,7 +20,7 @@ class AcneService:
     def __init__(self) -> None:
         pass
 
-    def predict_image_has_acne(self, image_path, model_path, img_size=(128, 128)) -> bool:
+    def predict_image_severity(self, image_path, model_path, img_size=(128, 128)) -> int:
         model = joblib.load(model_path)
 
         img = imread(image_path)
@@ -30,21 +31,28 @@ class AcneService:
         hog_features = np.array(hog_features).reshape(1, -1)
         
         prediction = model.predict(hog_features)
-        if prediction[0] == 1:
-            return True
-        else:
-            return False
+        return prediction[0]
 
     def get_acne_report(self, photo: UploadFile):
-        logging.info(f'Generating acne report to {photo.filename}...')
+        logging.info(f'Generating acne report for {photo.filename}...')
         storage_s3 = StorageS3(bucket_name=BucketS3Enum.BUCKET_TRAINED_MODEL.value)
         files_s3 = storage_s3.list_all_files()
 
-        try:        
+        def extract_datetime_from_filename(filename):
+            try:
+                timestamp_str = filename.split(' svm_model.pkl')[0]
+                return datetime.strptime(timestamp_str, '%d-%m-%Y %H-%M-%S.%f')
+            except ValueError as e:
+                logging.error(f'Error parsing datetime from filename {filename}: {e}')
+                return datetime.min
+
+        try:
             if files_s3:
+                # Ordenar arquivos pelo timestamp no nome
+                files_s3.sort(key=extract_datetime_from_filename, reverse=True)
                 last_model_name = os.path.split(files_s3[0])[-1]
             else:
-                raise HTTPException(404, 'Any model.pkl found in bucket...')
+                raise HTTPException(404, 'No model.pkl found in bucket...')
 
             tmp_dir = tempfile.mkdtemp(prefix='last_model_pkl')
             last_model_path = os.path.join(tmp_dir, last_model_name)
@@ -53,16 +61,21 @@ class AcneService:
             with open(os.path.join(tmp_dir, photo.filename), 'wb') as tmp_file:
                 tmp_file.write(photo.file.read())
             
-            has_acne = self.predict_image_has_acne(os.path.join(tmp_dir, photo.filename), last_model_path)
+            severity = self.predict_image_severity(os.path.join(tmp_dir, photo.filename), last_model_path)
 
             shutil.rmtree(tmp_dir)
 
-            if has_acne:
-                report_msg = 'Você possí acne, recomendamos buscar um dermatologista!'
-            else:
-                report_msg = 'Você não possuí acne, tudo normal por aqui!'
+            severity_messages = {
+                0: 'Você não possuí acne, tudo normal por aqui!',
+                1: 'Você possuí acne leve (grau 1), recomendamos buscar um dermatologista!',
+                2: 'Você possuí acne moderada (grau 2), recomendamos buscar um dermatologista!',
+                3: 'Você possuí acne grave (grau 3), recomendamos buscar um dermatologista!',
+                4: 'Você possuí acne muito grave (grau 4), recomendamos buscar um dermatologista!'
+            }
 
-            return {'status': has_acne, 'report': report_msg}
+            report_msg = severity_messages.get(severity, 'Severidade desconhecida. Por favor, consulte um dermatologista.')
+
+            return {'status': severity != 0, 'severity': severity, 'report': report_msg}
         
         except Exception as e:
             if os.path.exists(tmp_dir):

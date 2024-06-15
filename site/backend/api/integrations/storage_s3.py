@@ -1,10 +1,12 @@
 import boto3
 import logging
+from os import getenv
 
 class StorageS3:
 
     def __init__(self, bucket_name: str, profile_name: str='faculdade') -> None:
-        # boto3.setup_default_session(profile_name=profile_name) # uncooment to run local
+        if getenv('ENVIRONMENT') != 'PRD':
+            boto3.setup_default_session(profile_name=profile_name) # uncooment to run local
         self.s3 = boto3.client('s3')
         self.bucket_name = bucket_name
 
