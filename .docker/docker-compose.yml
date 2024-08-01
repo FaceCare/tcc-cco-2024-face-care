@@ -19,6 +19,7 @@ services:
       dockerfile: "Dockerfile"
     environment:
       DATABASE_URL: mysql+pymysql://${USER_DB}:${MYSQL_ROOT_PASSWORD}@mysql:3306/tcc
+      ENVIRONMENT: PRD
     ports:
       - "8000:8000"
     networks:
