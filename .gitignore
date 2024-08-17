@@ -32,3 +32,6 @@ svm/
 
 
 temp_image.jpg
+
+*.jpg
+*.png
