@@ -39,28 +39,20 @@ class AcneService:
 
     def get_acne_report(self, photo: UploadFile):
         logging.info(f'Generating acne report for {photo.filename}...')
-        storage_s3 = StorageS3(bucket_name=BucketS3Enum.BUCKET_TRAINED_MODEL.value)
-        files_s3 = storage_s3.list_all_files()
-
-        def extract_datetime_from_filename(filename):
-            try:
-                timestamp_str = filename.split(' cnn_model.h5')[0]
-                return datetime.strptime(timestamp_str, '%d-%m-%Y %H-%M-%S.%f')
-            except ValueError as e:
-                logging.error(f'Error parsing datetime from filename {filename}: {e}')
-                return datetime.min
+        
 
         try:
-            if files_s3:
-                # Ordenar arquivos pelo timestamp no nome
-                files_s3.sort(key=extract_datetime_from_filename, reverse=True)
-                last_model_name = os.path.split(files_s3[0])[-1]
-            else:
-                raise HTTPException(404, 'No model.h5 found in bucket...')
-
-            tmp_dir = tempfile.mkdtemp(prefix='last_model_h5')
-            last_model_path = os.path.join(tmp_dir, last_model_name)
-            storage_s3.download(last_model_name, last_model_path)
+            PREFFIX_FOLDER_KERAS = 'last_model_keras'
+            tmp_dir = tempfile.gettempdir()
+            folder_model = [item for item in os.listdir(tmp_dir) if item.startswith(PREFFIX_FOLDER_KERAS)]
+            if len(folder_model) != 1:
+                raise HTTPException(500, 'Model folder not found!')
+            
+            last_model_name = os.listdir(os.path.join(tmp_dir, folder_model[0]))
+            if len(last_model_name) != 1:
+                raise HTTPException(500, 'Model file not found!')
+            
+            last_model_path = os.path.join(tmp_dir, last_model_name[0])
 
             with open(os.path.join(tmp_dir, photo.filename), 'wb') as tmp_file:
                 tmp_file.write(photo.file.read())
