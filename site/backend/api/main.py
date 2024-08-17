@@ -55,7 +55,7 @@ app = FastAPI(
     version=f"1.0.0",
     docs_url="/docs",
     root_path=f"",
-    # lifespan=lifespan
+    lifespan=lifespan
 )
 
 app.add_middleware(
