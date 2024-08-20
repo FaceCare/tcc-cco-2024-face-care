@@ -1,0 +1,48 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - feature/update-workflow
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        playbook: [modeloIA.yaml, backend.yaml, tratamentoImg.yaml]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Python dependencies and Ansible
+        run: |
+          python3 -m pip install --upgrade pip
+          find . -name "requirements.txt" -exec python3 -m pip install -r {} \;
+          python3 -m pip install ansible boto3 botocore
+
+      - name: Configure AWS CLI credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: |
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set aws_session_token $AWS_SESSION_TOKEN
+          aws configure set default.region "us-east-1"
+
+      - name: Install Ansible Galaxy collection
+        run: ansible-galaxy collection install amazon.aws
+
+      - name: Deploy playbook
+        run: |
+          cd ${{ github.workspace }}/ansible
+          ansible-playbook -i aws_ec2.yml ${{ matrix.playbook }} -e "ansible_python_interpreter=/usr/bin/python3"

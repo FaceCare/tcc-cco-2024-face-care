@@ -3,7 +3,7 @@ name: Deploy backend to AWS
 on:
   push:
     branches:
-      - feature/update-workflow
+      - test
 
 jobs:
   setup:
