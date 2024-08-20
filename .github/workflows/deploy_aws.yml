@@ -22,6 +22,14 @@ jobs:
           python-version: "3.10"
           cache: "pip"
 
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install Python dependencies and Ansible
         run: |
           python3 -m pip install --upgrade pip
@@ -47,10 +55,3 @@ jobs:
           cd ${{ github.workspace }}/ansible
           ansible-playbook -i aws_ec2.yml ${{ matrix.playbook }} -e "ansible_python_interpreter=/usr/bin/python3"
 
-      - name: Cache Python dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
