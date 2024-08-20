@@ -25,7 +25,7 @@ jobs:
       - name: Install Python dependencies and Ansible
         run: |
           python3 -m pip install --upgrade pip
-          find . -name "requirements.txt" -exec python3 -m pip install -r {} \;
+          find . -name "requirements.txt" -exec sh -c 'echo "Installing dependencies from {}"; python3 -m pip install -r {}' \;
           python3 -m pip install ansible boto3 botocore
 
       - name: Configure AWS CLI credentials
