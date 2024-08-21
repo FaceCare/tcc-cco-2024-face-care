@@ -52,7 +52,7 @@ class AcneService:
             if len(last_model_name) != 1:
                 raise HTTPException(500, 'Model file not found!')
             
-            last_model_path = os.path.join(tmp_dir, folder_model,last_model_name[0])
+            last_model_path = os.path.join(tmp_dir, folder_model[0], last_model_name[0])
 
             with open(os.path.join(tmp_dir, photo.filename), 'wb') as tmp_file:
                 tmp_file.write(photo.file.read())
