@@ -29,7 +29,7 @@ data "aws_iam_instance_profile" "instance_profile" {
 resource "aws_instance" "jupiter_notebook" {
   ami                         = "ami-012485deee5681dc0"
   # ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3a.small"
+  instance_type = "t2.xlarge"
   # user_data                   = file("jupiter.sh")
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.public_subnet[0].id
@@ -37,7 +37,7 @@ resource "aws_instance" "jupiter_notebook" {
   iam_instance_profile        = data.aws_iam_instance_profile.instance_profile.name
 
   root_block_device {
-    volume_size = 20
+    volume_size = 100
     volume_type = "gp3"
   }
   tags = {
