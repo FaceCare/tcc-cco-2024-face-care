@@ -5,12 +5,8 @@ import numpy as np
 import shutil
 from fastapi import UploadFile
 from fastapi.exceptions import HTTPException
-from datetime import datetime
 import tensorflow as tf
 from PIL import Image
-
-from integrations.storage_s3 import StorageS3
-from enums.bucket_s3_enum import BucketS3Enum
 
 class AcneService:
 
@@ -54,10 +50,15 @@ class AcneService:
             
             last_model_path = os.path.join(tmp_dir, folder_model[0], last_model_name[0])
 
-            with open(os.path.join(tmp_dir, photo.filename), 'wb') as tmp_file:
+            photo_path = os.path.join(tmp_dir, photo.filename)
+            with open(photo_path, 'wb') as tmp_file:
                 tmp_file.write(photo.file.read())
             
-            severity = self.predict_image_severity(os.path.join(tmp_dir, photo.filename), last_model_path)
+            with Image.open(photo_path) as img:
+                gray_image = img.convert('L')
+                gray_image.save(photo_path)
+
+            severity = self.predict_image_severity(photo_path, last_model_path)
 
             shutil.rmtree(tmp_dir)
 
