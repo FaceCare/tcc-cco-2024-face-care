@@ -24,7 +24,7 @@ class AcneService:
         img_array = np.expand_dims(img_array, axis=0)
         return img_array
 
-    def predict_image_severity(self, image_path, model_path, img_size=(512, 512)) -> int:
+    def predict_image_severity_and_confidence(self, image_path, model_path, img_size=(512, 512)) -> int:
 
         def softmax_v2(x):
             return tf.nn.softmax(x)
@@ -35,7 +35,10 @@ class AcneService:
         image = self.preprocess_image(image_path)
         predictions = model.predict(image)
         predicted_class = np.argmax(predictions, axis=1)
-        return predicted_class[0]
+        confidence = float(np.max(predictions, axis=1)[0]) * 100
+        confidence = f'{confidence:.2f}%'
+
+        return predicted_class[0], confidence
 
     def get_acne_report(self, photo: UploadFile, last_model_keras_name: str):
         logging.info(f'Generating acne report for {photo.filename}...')
@@ -48,7 +51,7 @@ class AcneService:
             with open(photo_path, 'wb') as tmp_file:
                 tmp_file.write(photo.file.read())
 
-            severity = self.predict_image_severity(photo_path, last_model_path)
+            severity, confidence = self.predict_image_severity_and_confidence(photo_path, last_model_path)
 
             # TODO: save in bucket raw to use later
             os.remove(photo_path)
@@ -63,7 +66,7 @@ class AcneService:
 
             report_msg = severity_messages.get(severity, 'Severidade desconhecida. Por favor, consulte um dermatologista.')
 
-            return {'status': severity != 0, 'severity': severity, 'report': report_msg}
+            return {'status': severity != 0, 'severity': severity, 'confidence': confidence, 'report': report_msg}
         
         except Exception as e:
             if os.path.exists(photo_path):

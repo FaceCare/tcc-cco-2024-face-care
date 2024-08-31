@@ -10,6 +10,7 @@ numpy==1.26.4
 joblib==1.4.2
 tensorflow==2.16.1
 pillow==10.4.0
+scikit-image==0.24.0
 
 # https://fastapi.tiangolo.com/tutorial/sql-databases/
 # https://github.com/tiangolo/full-stack-fastapi-template/blob/master/backend/app/api/routes/login.py
