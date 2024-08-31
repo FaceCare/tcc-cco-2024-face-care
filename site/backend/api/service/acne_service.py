@@ -2,11 +2,11 @@ import logging
 import tempfile
 import os
 import numpy as np
-import shutil
 from fastapi import UploadFile
-from fastapi.exceptions import HTTPException
 import tensorflow as tf
 from PIL import Image
+from skimage.color import rgb2gray
+from skimage.io import imread
 
 class AcneService:
 
@@ -14,13 +14,17 @@ class AcneService:
         pass
 
     def preprocess_image(self, image_path):
-        img = Image.open(image_path).convert('RGB')
+        img = Image.open(image_path)
+        
+        if img.mode == 'RGB':
+            img = img.convert('L')
+        
         img = img.resize((512, 512))
         img_array = np.array(img)
         img_array = np.expand_dims(img_array, axis=0)
         return img_array
 
-    def predict_image_severity(self, image_path, model_path, img_size=(128, 128)) -> int:
+    def predict_image_severity(self, image_path, model_path, img_size=(512, 512)) -> int:
 
         def softmax_v2(x):
             return tf.nn.softmax(x)
@@ -33,34 +37,21 @@ class AcneService:
         predicted_class = np.argmax(predictions, axis=1)
         return predicted_class[0]
 
-    def get_acne_report(self, photo: UploadFile):
+    def get_acne_report(self, photo: UploadFile, last_model_keras_name: str):
         logging.info(f'Generating acne report for {photo.filename}...')
         
-
         try:
-            PREFFIX_FOLDER_KERAS = 'last_model_keras'
-            tmp_dir = tempfile.gettempdir()
-            folder_model = [item for item in os.listdir(tmp_dir) if item.startswith(PREFFIX_FOLDER_KERAS)]
-            if len(folder_model) != 1:
-                raise HTTPException(500, 'Model folder not found!')
-            
-            last_model_name = os.listdir(os.path.join(tmp_dir, folder_model[0]))
-            if len(last_model_name) != 1:
-                raise HTTPException(500, 'Model file not found!')
-            
-            last_model_path = os.path.join(tmp_dir, folder_model[0], last_model_name[0])
+            tmp_dir = tempfile.gettempdir()            
+            last_model_path = os.path.join(tmp_dir, last_model_keras_name)
 
             photo_path = os.path.join(tmp_dir, photo.filename)
             with open(photo_path, 'wb') as tmp_file:
                 tmp_file.write(photo.file.read())
-            
-            with Image.open(photo_path) as img:
-                gray_image = img.convert('L')
-                gray_image.save(photo_path)
 
             severity = self.predict_image_severity(photo_path, last_model_path)
 
-            shutil.rmtree(tmp_dir)
+            # TODO: save in bucket raw to use later
+            os.remove(photo_path)
 
             severity_messages = {
                 0: 'Você não possuí acne, tudo normal por aqui!',
@@ -75,6 +66,6 @@ class AcneService:
             return {'status': severity != 0, 'severity': severity, 'report': report_msg}
         
         except Exception as e:
-            if os.path.exists(tmp_dir):
-                shutil.rmtree(tmp_dir)
+            if os.path.exists(photo_path):
+                os.remove(photo_path)
             raise e

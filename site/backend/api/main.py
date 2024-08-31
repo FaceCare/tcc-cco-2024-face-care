@@ -18,18 +18,17 @@ logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
+def extract_datetime_from_filename(filename):
+    try:
+        timestamp_str = filename.split(' cnn_model.keras')[0]
+        return datetime.strptime(timestamp_str, '%d-%m-%Y %H-%M-%S.%f')
+    except ValueError:
+        return datetime.min
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     storage_s3 = StorageS3(bucket_name=BucketS3Enum.BUCKET_TRAINED_MODEL.value)
     files_s3 = storage_s3.list_all_files()
-    PREFFIX_FOLDER_KERAS = 'last_model_keras'
-
-    def extract_datetime_from_filename(filename):
-        try:
-            timestamp_str = filename.split(' cnn_model.keras')[0]
-            return datetime.strptime(timestamp_str, '%d-%m-%Y %H-%M-%S.%f')
-        except ValueError:
-            return datetime.min
 
     if files_s3:
         # Ordenar arquivos pelo timestamp no nome
@@ -38,15 +37,18 @@ async def lifespan(app: FastAPI):
     else:
         raise HTTPException(404, 'No model.keras found in bucket...')
 
-    tmp_dir_path = tempfile.gettempdir()
-    old_folders = [ item for item in os.listdir(tmp_dir_path) if item.startswith(PREFFIX_FOLDER_KERAS) ]
-    for folder in old_folders:
-        if os.path.isdir:
-            shutil.rmtree(os.path.join(tmp_dir_path, folder))
+    tmp_dir = tempfile.gettempdir()
+    existing_models = [f for f in os.listdir(tmp_dir) if f.endswith('.keras')]
+    
+    for f in existing_models:
+        if f != last_model_name:
+            shutil.rmtree(os.path.join(tmp_dir, f))
+    
+    if last_model_name not in existing_models:
+        last_model_path = os.path.join(tmp_dir, last_model_name)
+        storage_s3.download(last_model_name, last_model_path)
 
-    tmp_dir = tempfile.mkdtemp(prefix=PREFFIX_FOLDER_KERAS)
-    last_model_path = os.path.join(tmp_dir, last_model_name)
-    storage_s3.download(last_model_name, last_model_path)
+    app.state.model_keras = last_model_name
 
     yield
 
