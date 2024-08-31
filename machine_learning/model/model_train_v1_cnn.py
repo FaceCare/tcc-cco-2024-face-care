@@ -44,7 +44,7 @@ def download_cnn_images(severity_levels, dir_cnn_images):
 # DOWNLOAD MODEL CNN IMAGES FROM S3
 severity_levels = ['Severidade 0', 'Severidade 1', 'Severidade 2', 'Severidade 3', 'Severidade 4']
 data_dir = 'cnn_images'
-# download_cnn_images(severity_levels, data_dir)
+download_cnn_images(severity_levels, data_dir)
 
 # MODEL CNN
 FILE_KERAS_NAME = f"{datetime.datetime.now().strftime('%d-%m-%Y %H-%M-%S.%f')} cnn_model.keras"
