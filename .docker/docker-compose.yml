@@ -30,8 +30,8 @@ services:
     deploy:
       resources:
         limits:
-          memory: "4gb"
-          cpus: "2"
+          memory: "8gb"
+          cpus: "3"
 
 networks:
   tcc_network:
