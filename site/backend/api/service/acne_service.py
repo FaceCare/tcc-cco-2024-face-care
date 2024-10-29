@@ -16,8 +16,7 @@ class AcneService:
     def preprocess_image(self, image_path):
         img = Image.open(image_path)
         
-        if img.mode == 'RGB':
-            img = img.convert('L')
+        img = img.convert('L')
         
         img = img.resize((512, 512))
         img_array = np.array(img)
