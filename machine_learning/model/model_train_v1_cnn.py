@@ -44,7 +44,8 @@ def download_cnn_images(severity_levels, dir_cnn_images):
 # DOWNLOAD MODEL CNN IMAGES FROM S3
 severity_levels = ['Severidade 0', 'Severidade 1', 'Severidade 2', 'Severidade 3', 'Severidade 4']
 data_dir = 'cnn_images'
-download_cnn_images(severity_levels, data_dir)
+# data_dir = '/tmp/faculdade/consumed3'
+# download_cnn_images(severity_levels, data_dir)
 
 # MODEL CNN
 FILE_KERAS_NAME = f"{datetime.datetime.now().strftime('%d-%m-%Y %H-%M-%S.%f')} cnn_model.keras"
@@ -71,7 +72,7 @@ print(f'Configured model with params = \n{config_model}\n')
 print('Getting training dataset ...\n')
 train_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
-    validation_split=0.2,
+    validation_split=0.1,
     subset="training",
     seed=SEED,
     image_size=(img_height, img_width),
@@ -81,7 +82,7 @@ train_ds = tf.keras.utils.image_dataset_from_directory(
 print('Getting validation dataset ...\n')
 val_ds = tf.keras.utils.image_dataset_from_directory(
   data_dir,
-  validation_split=0.2,
+  validation_split=0.1,
   subset="validation",
   seed=SEED,
   image_size=(img_height, img_width),
@@ -108,7 +109,7 @@ data_augmentation = keras.Sequential(
 print('Sequential model ...\n')
 model = Sequential([
   layers.Input(shape=(img_height, img_width, SCALE_COLOR_IMG)),
-  data_augmentation,
+  # data_augmentation,
   tf.keras.layers.Rescaling(1./255),
   tf.keras.layers.Conv2D(32, (SCALE_COLOR_IMG,SCALE_COLOR_IMG), activation='relu'),
   tf.keras.layers.MaxPooling2D(2, 2),
@@ -145,5 +146,5 @@ history = model.fit(
 print(f'Saving model {FILE_KERAS_NAME} ...\n')
 model.save(FILE_KERAS_NAME, include_optimizer=False)
 
-print(f'Uploading {FILE_KERAS_NAME} to {BUCKET_CONSUMED} ...')
+print(f'Uploading {FILE_KERAS_NAME} to {BUCKET_MODEL} ...')
 s3.upload_file(FILE_KERAS_NAME, BUCKET_MODEL, FILE_KERAS_NAME)
