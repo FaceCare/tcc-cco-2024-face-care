@@ -47,10 +47,10 @@
         state: present
         executable: pip3
 
-    - name: Add cronjob to run model_train_v1_cnn.py every 30 minutes
+    - name: Add cronjob to run acne_classification_model_cnn_v3.py every 30 minutes
       become: true
       cron:
-        name: "Run model_train_v1_cnn.py every 30 minutes"
+        name: "Run acne_classification_model_cnn_v3.py every 30 minutes"
         minute: "*/30"
-        job: "cd ~/tcc/tcc-cco-2024-face-care/machine_learning/model/ && python3 model_train_v1_cnn.py"
+        job: "cd ~/tcc/tcc-cco-2024-face-care/machine_learning/model/ && python3 acne_classification_model_cnn_v3.py"
         state: present
