@@ -1,0 +1,147 @@
+---
+- name: Wait for connection to be available and install Docker
+  hosts: all
+  vars:
+    ansible_connection: aws_ssm
+    ansible_aws_ssm_bucket_name: ansible-tcc
+    ansible_aws_ssm_region: us-east-1
+  tasks:
+    - name: Wait for connection
+      wait_for_connection:
+
+    - name: Grant sudo permissions to ssm-user
+      become: yes
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/ssm-agent-users
+        content: "ssm-user ALL=(ALL) NOPASSWD:ALL"
+        mode: "0440"
+
+    - name: Update apt package index and upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+      become: yes
+
+    - name: Install Python 3.10 and pip
+      apt:
+        name:
+          - python3.10
+          - python3-pip
+        state: present
+      become: yes
+
+    - name: Set Python 3.10 as default
+      ansible.builtin.shell: update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+      become: yes
+
+    - name: Install setuptools and wheel using pip
+      pip:
+        name:
+          - setuptools
+          - wheel
+        executable: pip3.10
+      become: yes
+
+    - name: Install Docker prerequisites
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+      become: yes
+
+    - name: Add Docker GPG key and repository
+      ansible.builtin.shell: >
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        && sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      become: yes
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+      become: yes
+
+    - name: Create Docker group and add current user to Docker group
+      ansible.builtin.group:
+        name: docker
+        state: present
+      become: yes
+      vars:
+        groups: docker
+        append: yes
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+      become: yes
+
+    - name: Ensure ~/.ssh directory exists
+      ansible.builtin.file:
+        path: /home/ssm-user/.ssh
+        state: directory
+        mode: "0700"
+      become: yes
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+      become: yes
+
+    - name: Create Nginx reverse proxy configuration file
+      become: yes
+      ansible.builtin.copy:
+        dest: /etc/nginx/sites-available/reverse-proxy.conf
+        content: |
+          server {
+              listen 80;
+              server_name   facecare.ddns.net;
+
+              access_log /var/log/nginx/reverse-access.log;
+              error_log /var/log/nginx/reverse-error.log;
+
+              location / {
+                  proxy_pass http://127.0.0.1:8000;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+
+                  # WebSocket support
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+              }
+              location /jupyter/ {
+                  proxy_pass http://127.0.0.1:8888;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+
+                  # WebSocket support
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+              }
+          }
+
+    - name: Enable Nginx reverse proxy configuration
+      become: yes
+      ansible.builtin.shell: ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/reverse-proxy.conf || true
+
+    - name: Test Nginx configuration
+      become: yes
+      command: nginx -t
+
+    - name: Restart Nginx
+      become: yes
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
